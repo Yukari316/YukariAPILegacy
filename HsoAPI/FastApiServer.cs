@@ -26,6 +26,7 @@ namespace HsoAPI
             };
             //注册控制器
             Server.Register(typeof(TestTool).Assembly);
+            Server.Register(typeof(Hso).Assembly);
             //启动服务器
             Server.Open();
             await Task.Delay(-1);
