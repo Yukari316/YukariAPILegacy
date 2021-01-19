@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "YukariAPI": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "server": "124.156.146.248",
+        "passwd": "YukariLove",
+        "user": "root"
+      }
+    }
+  }
+}

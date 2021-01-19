@@ -1,7 +1,7 @@
 using System;
 using SqlSugar;
 
-namespace HsoAPI.Database
+namespace YukariAPI.Database
 {
     public class SugarUtils
     {

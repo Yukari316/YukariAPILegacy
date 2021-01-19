@@ -2,7 +2,7 @@ using System;
 using System.Threading.Tasks;
 using BeetleX.FastHttpApi;
 
-namespace HsoAPI.Controller
+namespace YukariAPI.Controller
 {
     [Controller]
     public class TestTool

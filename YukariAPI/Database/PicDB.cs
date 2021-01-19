@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace HsoAPI.Database
+namespace YukariAPI.Database
 {
     public class PicDB
     {
