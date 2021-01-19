@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using BeetleX.FastHttpApi;
 
-namespace YukariAPI
+namespace YukariAPI.Tool
 {
     public static class Utils
     {
@@ -13,13 +13,13 @@ namespace YukariAPI
         /// <param name="message">API消息</param>
         public static JsonResult GenResult(List<object> data, int code = 0, string message = "OK")
         {
-            return new (new
+            return new(new
             {
                 code,
                 message,
                 count = data?.Count ?? 0,
                 data
-            });
+            }, true);
         }
     }
 }

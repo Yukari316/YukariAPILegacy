@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using BeetleX.FastHttpApi;
 using YukariAPI.Database;
+using YukariAPI.Enumeration;
+using Utils = YukariAPI.Tool.Utils;
 
 namespace YukariAPI.Controller
 {
@@ -14,9 +16,8 @@ namespace YukariAPI.Controller
         /// </summary>
         /// <param name="r18">r18开关</param>
         [Get(Route = "/setu")]
-        public Task<object> RandomPic(bool r18 = false, string tag = null)
+        public Task<object> RandomPic(bool r18 = false)
         {
-            using var client = SugarUtils.CreateSqlSugarClient();
             //获取ID列表
             var qPicList = PicDB.GetAllIdlList(r18);
             if (qPicList == null || qPicList.Count == 0)
@@ -46,6 +47,18 @@ namespace YukariAPI.Controller
                     url    = pic.Url
                 }
             }));
+        }
+
+        [Get(Route = "add_pic")]
+        public Task<object> AddPic(string token = null, long pid = 0, int index = -1)
+        {
+            if (string.IsNullOrEmpty(token))
+                return Task.FromResult<object>(Utils.GenResult(null, 403, "Auth:null token"));
+            if (pid <= 0) return Task.FromResult<object>(Utils.GenResult(null, 400, "Auth:illegal pid"));
+
+            //token检查
+            AuthLevel level = AuthDB.GetAuthLevel(token);
+            return Task.FromResult<object>(new JsonResult(new {l = level}));
         }
     }
 }

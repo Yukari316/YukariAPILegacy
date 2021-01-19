@@ -2,6 +2,8 @@ using System.Reflection;
 using System.Threading.Tasks;
 using BeetleX.EventArgs;
 using BeetleX.FastHttpApi;
+using YukariAPI.Enumeration;
+using YukariAPI.Tool;
 
 namespace YukariAPI
 {
@@ -18,16 +20,17 @@ namespace YukariAPI
         /// 初始化服务器
         /// </summary>
         /// <param name="port">端口</param>
-        /// <param name="useBXLog">使用debug日志</param>
-        public ApiServer(int port, bool useBXLog = false)
+        /// <param name="useDebugLog">使用debug日志</param>
+        public ApiServer(int port, bool useDebugLog = false)
         {
             Server              = new HttpApiServer();
             Server.Options.Host = "127.0.0.1";
             Server.Options.Port = port;
-            //关闭原log
-            Server.Options.LogLevel     = useBXLog ? LogType.Debug : LogType.Off;
-            Server.Options.LogToConsole = useBXLog;
-            Server.Options.Debug        = useBXLog;
+            //设置log
+            Server.Options.LogLevel     = useDebugLog ? LogType.Debug : LogType.Off;
+            Server.Options.LogToConsole = useDebugLog;
+            Server.Options.Debug        = useDebugLog;
+            ConsoleLog.SetLogLevel(useDebugLog ? LogLevel.Debug : LogLevel.Info);
             Server.Options.CrossDomain = new OptionsAttribute
             {
                 AllowOrigin = "*"

@@ -8,10 +8,10 @@ namespace YukariAPI.Database
         /// 查找图片
         /// </summary>
         /// <param name="id">数据库id</param>
-        public static Setu GetPicById(int id)
+        public static HsoPic GetPicById(int id)
         {
             using var client = SugarUtils.CreateSqlSugarClient();
-            return client.Queryable<Setu>()
+            return client.Queryable<HsoPic>()
                          .InSingle(id);
         }
 
@@ -22,7 +22,7 @@ namespace YukariAPI.Database
         public static int GetPicCount(bool r18)
         {
             using var client = SugarUtils.CreateSqlSugarClient();
-            return client.Queryable<Setu>()
+            return client.Queryable<HsoPic>()
                          .Where(pic => pic.R18 == r18)
                          .Count();
         }
@@ -34,7 +34,7 @@ namespace YukariAPI.Database
         public static List<int> GetAllIdlList(bool r18)
         {
             using var client = SugarUtils.CreateSqlSugarClient();
-            return client.Queryable<Setu>()
+            return client.Queryable<HsoPic>()
                          .Where(pic => pic.R18 == r18)
                          .Select(id => id.Id)
                          .ToList();

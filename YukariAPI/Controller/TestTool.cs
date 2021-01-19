@@ -15,11 +15,5 @@ namespace YukariAPI.Controller
                                                           $"Requests   {context.Server.TotalRequest}\r\n"             +
                                                           $"Errors     {context.Server.RequestErrors}", true));
         }
-
-        [Get]
-        public Task<object> Test()
-        {
-            return Task.FromResult<object>(new JsonResult(new {Message = "好耶"}, true));
-        }
     }
 }
