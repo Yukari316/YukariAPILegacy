@@ -49,6 +49,26 @@ namespace YukariAPI.Database
         }
 
         /// <summary>
+        /// 根据pid查询图片数量
+        /// </summary>
+        /// <param name="pid">pid</param>
+        public static int GetPicCountByPid(long pid)
+        {
+            try
+            {
+                using var client = SugarUtils.CreateSqlSugarClient();
+                return client.Queryable<HsoPic>()
+                             .Where(pic => pic.PicId == pid)
+                             .Count();
+            }
+            catch (Exception e)
+            {
+                ConsoleLog.Error("Database", ConsoleLog.ErrorLogBuilder(e));
+                return -1;
+            }
+        }
+
+        /// <summary>
         /// 获取图片id列表
         /// </summary>
         /// <param name="r18">r18开关</param>
@@ -90,22 +110,21 @@ namespace YukariAPI.Database
         }
 
         /// <summary>
-        /// 根据pid查询图片数量
+        /// 查找图片是否存在
         /// </summary>
         /// <param name="pid">pid</param>
-        public static int GetPicCountByPid(long pid)
+        public static bool PicExitis(long pid)
         {
             try
             {
                 using var client = SugarUtils.CreateSqlSugarClient();
                 return client.Queryable<HsoPic>()
-                             .Where(pic => pic.PicId == pid)
-                             .Count();
+                             .Any(pic => pic.PicId == pid);
             }
             catch (Exception e)
             {
                 ConsoleLog.Error("Database", ConsoleLog.ErrorLogBuilder(e));
-                return -1;
+                return true;
             }
         }
 
@@ -126,6 +145,47 @@ namespace YukariAPI.Database
             {
                 ConsoleLog.Error("Database", ConsoleLog.ErrorLogBuilder(e));
                 return -1;
+            }
+        }
+
+        /// <summary>
+        /// 删除图片
+        /// </summary>
+        /// <param name="pid">pid</param>
+        public static bool DeletePic(long pid)
+        {
+            try
+            {
+                using var client = SugarUtils.CreateSqlSugarClient();
+                return client.Deleteable<HsoPic>()
+                             .Where(pic => pic.PicId == pid)
+                             .ExecuteCommandHasChange();
+            }
+            catch (Exception e)
+            {
+                ConsoleLog.Error("Database", ConsoleLog.ErrorLogBuilder(e));
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// 删除图片
+        /// </summary>
+        /// <param name="pid">pid</param>
+        /// <param name="index">index</param>
+        public static bool DeletePic(long pid, int index)
+        {
+            try
+            {
+                using var client = SugarUtils.CreateSqlSugarClient();
+                return client.Deleteable<HsoPic>()
+                             .Where(pic => pic.PicId == pid && pic.Index == index)
+                             .ExecuteCommandHasChange();
+            }
+            catch (Exception e)
+            {
+                ConsoleLog.Error("Database", ConsoleLog.ErrorLogBuilder(e));
+                return false;
             }
         }
     }

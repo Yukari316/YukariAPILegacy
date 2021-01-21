@@ -83,16 +83,16 @@ namespace YukariAPI.Controller
         /// <summary>
         /// 色图添加功能
         /// </summary>
-        /// <param name="apiKey">apikey</param>
+        /// <param name="apikey">apikey</param>
         /// <param name="pid">pid</param>
         /// <param name="index">index</param>
         [Get(Route = "/setu/add_pic")]
-        public async Task<JsonResult> AddPic(string apiKey = null, long pid = 0, int index = -1)
+        public async Task<JsonResult> AddPic(string apikey = null, long pid = 0, int index = -1)
         {
-            if (string.IsNullOrEmpty(apiKey))
+            if (string.IsNullOrEmpty(apikey))
                 return Utils.GenResult(null, 403, "Auth:Request refused(illegal apikey)");
             //apikey检查
-            AuthLevel level = AuthDB.GetAuthLevel(apiKey);
+            AuthLevel level = AuthDB.GetAuthLevel(apikey);
             switch (level)
             {
                 case AuthLevel.None:case AuthLevel.User:
@@ -106,7 +106,7 @@ namespace YukariAPI.Controller
             if (pid <= 0) return Utils.GenResult(null, 400, "Argument:Argument out of range(pid)");
 
             //更新数据库计数
-            if (!AuthDB.ApiKeyRequestCountUpdate(apiKey, AuthDB.GetApiKeyRequestCount(apiKey)))
+            if (!AuthDB.ApiKeyRequestCountUpdate(apikey, AuthDB.GetApiKeyRequestCount(apikey)))
             {
                 return Utils.GenResult(null, 500, "Database:Database error(update apikey count)");
             }
@@ -160,6 +160,51 @@ namespace YukariAPI.Controller
                 successCount,
                 proxyUrls.urls
             });
+        }
+
+        /// <summary>
+        /// 删除图片
+        /// </summary>
+        /// <param name="apikey">apikey</param>
+        /// <param name="pid">pid</param>
+        /// <param name="index">index</param>
+        [Get(Route = "setu/del_pic")]
+        public Task<JsonResult> DelPic(string apikey = null, long pid = 0, int index = -1)
+        {
+            if (string.IsNullOrEmpty(apikey))
+                return Task.FromResult(Utils.GenResult(null, 403, "Auth:Request refused(illegal apikey)"));
+            //apikey检查
+            AuthLevel level = AuthDB.GetAuthLevel(apikey);
+            switch (level)
+            {
+                case AuthLevel.None:case AuthLevel.User:
+                    return Task.FromResult(Utils.GenResult(null, 403, "Auth:Request refused(access denied)"));
+                case AuthLevel.Admin:
+                    break;
+                default:
+                    return Task.FromResult(Utils.GenResult(null, 400, "Auth:Request refused(unknown apikey)"));
+            }
+            //检查pid
+            if (pid <= 0) return Task.FromResult(Utils.GenResult(null, 400, "Argument:Argument out of range(pid)"));
+
+            //更新数据库计数
+            if (!AuthDB.ApiKeyRequestCountUpdate(apikey, AuthDB.GetApiKeyRequestCount(apikey)))
+            {
+                return Task.FromResult(Utils.GenResult(null, 500, "Database:Database error(update apikey count)"));
+            }
+
+            //查找图片是否存在
+            if(!PicDB.PicExitis(pid)) return Task.FromResult(Utils.GenResult(null, 404, "Database:Pic not found"));
+            //删除图片
+            if (index == -1)
+            {
+                if(!PicDB.DeletePic(pid)) return Task.FromResult(Utils.GenResult(null, 500, "Database:Pic delete failed"));
+            }
+            else
+            {
+                if(!PicDB.DeletePic(pid, index)) return Task.FromResult(Utils.GenResult(null, 500, "Database:Pic delete failed"));
+            }
+            return Task.FromResult(Utils.GenResult(new {}));
         }
     }
 }

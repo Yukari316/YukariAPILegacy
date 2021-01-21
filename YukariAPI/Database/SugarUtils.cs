@@ -1,7 +1,6 @@
 using System;
 using MySql.Data.MySqlClient;
 using SqlSugar;
-using YukariAPI.Tool;
 
 namespace YukariAPI.Database
 {

@@ -67,7 +67,7 @@ namespace YukariAPI.Tool
             lock (ConsoleWriterLock)
             {
                 Console.ForegroundColor = ConsoleColor.White;
-                Console.WriteLine($"[{DateTime.Now}][INFO][{type}]{message}");
+                Console.WriteLine($@"[{DateTime.Now}][INFO][{type}]{message}");
             }
         }
 
@@ -82,13 +82,13 @@ namespace YukariAPI.Tool
             lock (ConsoleWriterLock)
             {
                 Console.ForegroundColor = ConsoleColor.White;
-                Console.Write($"[{DateTime.Now}][");
+                Console.Write($@"[{DateTime.Now}][");
                 Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.Write("WARNINIG");
+                Console.Write(@"WARNINIG");
                 Console.ForegroundColor = ConsoleColor.White;
-                Console.Write($"][{type}]");
+                Console.Write($@"][{type}]");
                 Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.WriteLine($"{message}");
+                Console.WriteLine($@"{message}");
                 Console.ForegroundColor = ConsoleColor.White;
             }
         }
@@ -104,11 +104,11 @@ namespace YukariAPI.Tool
             lock (ConsoleWriterLock)
             {
                 Console.ForegroundColor = ConsoleColor.White;
-                Console.Write($"[{DateTime.Now}][");
+                Console.Write($@"[{DateTime.Now}][");
                 Console.ForegroundColor = ConsoleColor.Red;
-                Console.Write("ERROR");
+                Console.Write(@"ERROR");
                 Console.ForegroundColor = ConsoleColor.White;
-                Console.Write($"][{type}]");
+                Console.Write($@"][{type}]");
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine(message);
                 Console.ForegroundColor = ConsoleColor.White;
@@ -126,11 +126,11 @@ namespace YukariAPI.Tool
             lock (ConsoleWriterLock)
             {
                 Console.ForegroundColor = ConsoleColor.White;
-                Console.Write($"[{DateTime.Now}][");
+                Console.Write($@"[{DateTime.Now}][");
                 Console.ForegroundColor = ConsoleColor.DarkRed;
-                Console.Write("FATAL");
+                Console.Write(@"FATAL");
                 Console.ForegroundColor = ConsoleColor.White;
-                Console.Write($"][{type}]");
+                Console.Write($@"][{type}]");
                 Console.ForegroundColor = ConsoleColor.DarkRed;
                 Console.WriteLine(message);
                 Console.ForegroundColor = ConsoleColor.White;
@@ -148,11 +148,11 @@ namespace YukariAPI.Tool
             lock (ConsoleWriterLock)
             {
                 Console.ForegroundColor = ConsoleColor.White;
-                Console.Write($"[{DateTime.Now}][");
+                Console.Write($@"[{DateTime.Now}][");
                 Console.ForegroundColor = ConsoleColor.Cyan;
-                Console.Write("DEBUG");
+                Console.Write(@"DEBUG");
                 Console.ForegroundColor = ConsoleColor.White;
-                Console.Write($"][{type}]");
+                Console.Write($@"][{type}]");
                 Console.ForegroundColor = ConsoleColor.Cyan;
                 Console.WriteLine(message);
                 Console.ForegroundColor = ConsoleColor.White;

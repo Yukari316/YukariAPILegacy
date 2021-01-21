@@ -24,7 +24,7 @@ namespace YukariAPI
         public ApiServer(int port, bool useDebugLog = false)
         {
             Server              = new HttpApiServer();
-            Server.Options.Host = "0.0.0.0";
+            Server.Options.Host = "127.0.0.1";
             Server.Options.Port = port;
             //设置log
             Server.Options.LogLevel     = useDebugLog ? LogType.Debug : LogType.Off;
