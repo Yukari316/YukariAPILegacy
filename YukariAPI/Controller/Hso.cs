@@ -16,13 +16,13 @@ namespace YukariAPI.Controller
         /// </summary>
         /// <param name="r18">r18开关</param>
         [Get(Route = "/setu")]
-        public Task<object> RandomPic(bool r18 = false)
+        public Task<JsonResult> RandomPic(bool r18 = false)
         {
             //获取ID列表
             var qPicList = PicDB.GetAllIdlList(r18);
             if (qPicList == null || qPicList.Count == 0)
             {
-                return Task.FromResult<object>(Utils.GenResult(null, 100, "Database:Get Pic Index Failed"));
+                return Task.FromResult(Utils.GenResult(null, 500, "Database:Get Pic Index Failed"));
             }
             //随机选取ID
             Random rd       = new Random();
@@ -31,14 +31,20 @@ namespace YukariAPI.Controller
             var pic = PicDB.GetPicById(qPicList[randomId]);
             if (pic == null)
             {
-                return Task.FromResult<object>(Utils.GenResult(null, 101, "Database:Get Pic Info Failed"));
+                return Task.FromResult(Utils.GenResult(null, 500, "Database:Get Pic Info Failed"));
             }
+            //计数器
+            Task.Run(async () =>
+                     {
+                         await WebApis.KawaiiCount();
+                     });
 
-            return Task.FromResult<object>(Utils.GenResult(new List<object>
+            return Task.FromResult(Utils.GenResult(new List<object>
             {
                 new
                 {
                     pid    = pic.PicId,
+                    index  = pic.Index,
                     uid    = pic.UserId,
                     title  = pic.Title,
                     author = pic.Author,
@@ -49,16 +55,111 @@ namespace YukariAPI.Controller
             }));
         }
 
-        [Get(Route = "add_pic")]
-        public Task<object> AddPic(string token = null, long pid = 0, int index = -1)
+        /// <summary>
+        /// 色图添加功能
+        /// </summary>
+        /// <param name="apikey">key</param>
+        /// <param name="action">动作期望</param>
+        [Get(Route = "/setu/auth")]
+        public Task<JsonResult> ApiKeyVerify(string apikey = null, int action = -1)
         {
-            if (string.IsNullOrEmpty(token))
-                return Task.FromResult<object>(Utils.GenResult(null, 403, "Auth:null token"));
-            if (pid <= 0) return Task.FromResult<object>(Utils.GenResult(null, 400, "Auth:illegal pid"));
+            if (string.IsNullOrEmpty(apikey))
+                return Task.FromResult(Utils.GenResult(null, 400, "Auth:Request refused(illegal apikey)"));
+            //apikey检查
+            AuthLevel level = AuthDB.GetAuthLevel(apikey);
+            return Task.FromResult(Utils.GenResult(new
+            {
+                Level = level,
+                Actions = level switch
+                {
+                    AuthLevel.Admin => new[] {HsoAction.RandomPic, HsoAction.AddPic, HsoAction.DeletePic},
+                    AuthLevel.None => new[] {HsoAction.None},
+                    AuthLevel.User => new[] {HsoAction.RandomPic},
+                    _ => new[] {HsoAction.None}
+                }
+            }));
+        }
 
-            //token检查
-            AuthLevel level = AuthDB.GetAuthLevel(token);
-            return Task.FromResult<object>(new JsonResult(new {l = level}));
+        /// <summary>
+        /// 色图添加功能
+        /// </summary>
+        /// <param name="apiKey">apikey</param>
+        /// <param name="pid">pid</param>
+        /// <param name="index">index</param>
+        [Get(Route = "/setu/add_pic")]
+        public async Task<JsonResult> AddPic(string apiKey = null, long pid = 0, int index = -1)
+        {
+            if (string.IsNullOrEmpty(apiKey))
+                return Utils.GenResult(null, 403, "Auth:Request refused(illegal apikey)");
+            //apikey检查
+            AuthLevel level = AuthDB.GetAuthLevel(apiKey);
+            switch (level)
+            {
+                case AuthLevel.None:case AuthLevel.User:
+                    return Utils.GenResult(null, 403, "Auth:Request refused(access denied)");
+                case AuthLevel.Admin:
+                    break;
+                default:
+                    return Utils.GenResult(null, 400, "Auth:Request refused(unknown apikey)");
+            }
+            //检查pid
+            if (pid <= 0) return Utils.GenResult(null, 400, "Argument:Argument out of range(pid)");
+
+            //更新数据库计数
+            if (!AuthDB.ApiKeyRequestCountUpdate(apiKey, AuthDB.GetApiKeyRequestCount(apiKey)))
+            {
+                return Utils.GenResult(null, 500, "Database:Database error(update apikey count)");
+            }
+
+            //获取图片代理链接
+            var proxyUrls = await WebApis.GetPixivCatInfo(pid);
+            if (!proxyUrls.success)
+                return Utils.GenResult(null, -1,
+                                       $"WebAPI:PixivCat api error({proxyUrls.message})");
+            //判断图片是否已经存在
+            int picCount  = PicDB.GetPicCountByPid(pid);
+            if (picCount == -1)
+                return Utils.GenResult(null, 500,
+                                       "Database:Database error(get pic count failed)");
+            if (picCount >= proxyUrls.urls.Count)
+                return Utils.GenResult(null, -2, "Pic:Pic existed");
+            if (index > proxyUrls.urls.Count - 1) return Utils.GenResult(null, -3, "Pic:illegal Pic index");
+            //查找图片信息
+            var picApiRes = await WebApis.GetPixivInfo(pid);
+            if (!picApiRes.success)
+                return Utils.GenResult(null, -1,
+                                       $"WebAPI:Pixiv api error({picApiRes.message})");
+            var picInfo      = picApiRes.picData;
+            int successCount = 0;
+
+            //写入数据库
+            for (int i = 0; i < proxyUrls.urls.Count; i++)
+            {
+                if (PicDB.PicExitis(pid, i)) continue;
+                //写入对应图片信息
+                picInfo.Index = i;
+                picInfo.Url   = proxyUrls.urls[i];
+                int id = PicDB.InsertNewPic(picInfo);
+                if (id == -1)
+                    return Utils.GenResult(null, 500,
+                                          "Database:Database error(add new pic failed)");
+                successCount++;
+            }
+            //返回数据
+            return Utils.GenResult(new
+            {
+                picData = new
+                {
+                    picInfo.PicId,
+                    picInfo.UserId,
+                    picInfo.Title,
+                    picInfo.Author,
+                    picInfo.R18,
+                    picInfo.Tags
+                },
+                successCount,
+                proxyUrls.urls
+            });
         }
     }
 }

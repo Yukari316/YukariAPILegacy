@@ -10,14 +10,17 @@ namespace YukariAPI.Database
     [SugarTable("setu")]
     public class HsoPic
     {
-        [SugarColumn(ColumnName = "id", ColumnDataType = "int(11)", IsIdentity = true, IsPrimaryKey = true)]
-        public int Id { get; set; }
+        [SugarColumn(ColumnName = "id", ColumnDataType = "bigint(11)", IsIdentity = true, IsPrimaryKey = true)]
+        public long Id { get; set; }
 
-        [SugarColumn(ColumnName = "pid", ColumnDataType = "int(11)")]
-        public int PicId { get; set; }
+        [SugarColumn(ColumnName = "pid", ColumnDataType = "bigint(11)")]
+        public long PicId { get; set; }
 
-        [SugarColumn(ColumnName = "uid", ColumnDataType = "int(11)")]
-        public int UserId { get; set; }
+        [SugarColumn(ColumnName = "index", ColumnDataType = "int(11)")]
+        public long Index { get; set; }
+
+        [SugarColumn(ColumnName = "uid", ColumnDataType = "bigint(11)")]
+        public long UserId { get; set; }
 
         [SugarColumn(ColumnName = "title", ColumnDataType = "varchar(255)")]
         public string Title { get; set; }
@@ -41,8 +44,8 @@ namespace YukariAPI.Database
     [SugarTable("auth")]
     public class Auth
     {
-        [SugarColumn(ColumnName = "token", ColumnDataType = "varchar(255)", IsPrimaryKey = true)]
-        public string Token { get; set; }
+        [SugarColumn(ColumnName = "apikey", ColumnDataType = "varchar(255)", IsPrimaryKey = true)]
+        public string ApiKey { get; set; }
 
         [SugarColumn(ColumnName = "level", ColumnDataType = "int(11)")]
         public AuthLevel Level { get; set; }

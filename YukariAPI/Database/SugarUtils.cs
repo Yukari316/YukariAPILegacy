@@ -1,5 +1,7 @@
 using System;
+using MySql.Data.MySqlClient;
 using SqlSugar;
+using YukariAPI.Tool;
 
 namespace YukariAPI.Database
 {
@@ -9,16 +11,22 @@ namespace YukariAPI.Database
         /// <summary>
         /// 创建一个SQLiteClient
         /// </summary>
-        /// <returns>默认开启的SqlSugarClient</returns>
+        /// <returns>SqlSugarClient</returns>
         internal static SqlSugarClient CreateSqlSugarClient()
         {
-            string server = Environment.GetEnvironmentVariable("server");
-            string user   = Environment.GetEnvironmentVariable("user");
-            string passwd = Environment.GetEnvironmentVariable("passwd");
-
-            return new (new ConnectionConfig
+            var connectionStrBuilder =
+                new MySqlConnectionStringBuilder
+                {
+                    Server       = Environment.GetEnvironmentVariable("server"),
+                    Port         = Convert.ToUInt32(Environment.GetEnvironmentVariable("port")),
+                    Database     = "setu",
+                    UserID       = Environment.GetEnvironmentVariable("user"),
+                    Password     = Environment.GetEnvironmentVariable("passwd"),
+                    CharacterSet = "utf8mb4"
+                };
+            return new SqlSugarClient(new ConnectionConfig
             {
-                ConnectionString      = $"Server={server};Database=setu;Uid={user};Pwd={passwd};",
+                ConnectionString      = connectionStrBuilder.ToString(),
                 DbType                = DbType.MySql,
                 IsAutoCloseConnection = true,
                 InitKeyType           = InitKeyType.Attribute

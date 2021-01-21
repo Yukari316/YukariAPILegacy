@@ -5,6 +5,7 @@
       "environmentVariables": {
         "server": "124.156.146.248",
         "passwd": "YukariLove",
+        "port": "3306",
         "user": "root"
       }
     }
