@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using BeetleX.FastHttpApi;
 using YukariAPI.Database;
 using YukariAPI.Enumeration;
+using YukariAPI.Tool;
 using Utils = YukariAPI.Tool.Utils;
 
 namespace YukariAPI.Controller
@@ -14,9 +15,10 @@ namespace YukariAPI.Controller
         /// <summary>
         /// 随机色图
         /// </summary>
+        /// <param name="context">请求信息</param>
         /// <param name="r18">r18开关</param>
-        [Get(Route = "/setu")]
-        public Task<JsonResult> RandomPic(bool r18 = false)
+        [Get(Route = "/setu/")]
+        public Task<JsonResult> RandomPic(IHttpContext context, bool r18 = false)
         {
             //获取ID列表
             var qPicList = PicDB.GetAllIdlList(r18);
@@ -106,7 +108,7 @@ namespace YukariAPI.Controller
             if (pid <= 0) return Utils.GenResult(null, 400, "Argument:Argument out of range(pid)");
 
             //更新数据库计数
-            if (!AuthDB.ApiKeyRequestCountUpdate(apikey, AuthDB.GetApiKeyRequestCount(apikey)))
+            if (!AuthDB.ApiKeyRequestCountUpdate(apikey, AuthDB.GetApiKeyRequestCount(apikey) + 1))
             {
                 return Utils.GenResult(null, 500, "Database:Database error(update apikey count)");
             }
@@ -188,7 +190,7 @@ namespace YukariAPI.Controller
             if (pid <= 0) return Task.FromResult(Utils.GenResult(null, 400, "Argument:Argument out of range(pid)"));
 
             //更新数据库计数
-            if (!AuthDB.ApiKeyRequestCountUpdate(apikey, AuthDB.GetApiKeyRequestCount(apikey)))
+            if (!AuthDB.ApiKeyRequestCountUpdate(apikey, AuthDB.GetApiKeyRequestCount(apikey) + 1))
             {
                 return Task.FromResult(Utils.GenResult(null, 500, "Database:Database error(update apikey count)"));
             }

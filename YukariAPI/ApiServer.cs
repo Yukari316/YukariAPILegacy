@@ -1,3 +1,4 @@
+using System;
 using System.Reflection;
 using System.Threading.Tasks;
 using BeetleX.EventArgs;
@@ -27,8 +28,8 @@ namespace YukariAPI
             Server.Options.Host = "127.0.0.1";
             Server.Options.Port = port;
             //设置log
-            Server.Options.LogLevel     = useDebugLog ? LogType.Debug : LogType.Off;
-            Server.Options.LogToConsole = useDebugLog;
+            Server.Options.LogLevel     = useDebugLog ? LogType.Debug : LogType.Info;
+            Server.Options.LogToConsole = true;
             Server.Options.Debug        = useDebugLog;
             ConsoleLog.SetLogLevel(useDebugLog ? LogLevel.Debug : LogLevel.Info);
             Server.Options.CrossDomain = new OptionsAttribute
