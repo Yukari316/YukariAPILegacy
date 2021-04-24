@@ -28,11 +28,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="BeetleX.FastHttpApi" Version="1.9.3.12" />
-    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
-    <PackageReference Include="PyLibSharp" Version="1.2.3" />
-    <PackageReference Include="SqlSugarCore" Version="5.0.2.2" />
+    <PackageReference Include="BeetleX.FastHttpApi" Version="1.9.5" />
+    <PackageReference Include="JetBrains.Annotations" Version="2021.1.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+    <PackageReference Include="PyLibSharp" Version="1.2.4" />
+    <PackageReference Include="SqlSugarCore" Version="5.0.2.8" />
     <PackageReference Include="System.Configuration.ConfigurationManager" Version="5.0.0" />
+    <PackageReference Include="YukariToolBox" Version="1.1.3" />
   </ItemGroup>
 
   <ItemGroup>

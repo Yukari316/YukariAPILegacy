@@ -2,9 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using BeetleX.FastHttpApi;
+using JetBrains.Annotations;
 using YukariAPI.Database;
 using YukariAPI.Enumeration;
-using YukariAPI.Tool;
 using Utils = YukariAPI.Tool.Utils;
 
 namespace YukariAPI.Controller
@@ -17,14 +17,15 @@ namespace YukariAPI.Controller
         /// </summary>
         /// <param name="context">请求信息</param>
         /// <param name="r18">r18开关</param>
+        [UsedImplicitly]
         [Get(Route = "/setu/")]
-        public Task<JsonResult> RandomPic(IHttpContext context, bool r18 = false)
+        public JsonResult RandomPic(IHttpContext context, bool r18 = false)
         {
             //获取ID列表
             var qPicList = PicDB.GetAllIdlList(r18);
             if (qPicList == null || qPicList.Count == 0)
             {
-                return Task.FromResult(Utils.GenResult(null, 500, "Database:Get Pic Index Failed"));
+                return Utils.GenResult(null, 500, "Database:Get Pic Index Failed");
             }
             //随机选取ID
             Random rd       = new Random();
@@ -33,7 +34,7 @@ namespace YukariAPI.Controller
             var pic = PicDB.GetPicById(qPicList[randomId]);
             if (pic == null)
             {
-                return Task.FromResult(Utils.GenResult(null, 500, "Database:Get Pic Info Failed"));
+                return Utils.GenResult(null, 500, "Database:Get Pic Index Failed");
             }
             //计数器
             Task.Run(async () =>
@@ -41,7 +42,7 @@ namespace YukariAPI.Controller
                          await WebApis.KawaiiCount();
                      });
 
-            return Task.FromResult(Utils.GenResult(new List<object>
+            return Utils.GenResult(new List<object>
             {
                 new
                 {
@@ -52,9 +53,10 @@ namespace YukariAPI.Controller
                     author = pic.Author,
                     r18    = pic.R18,
                     tags   = pic.Tags.Split(','),
-                    url    = pic.Url
+                    url    = pic.Url,
+                    th = Environment.CurrentManagedThreadId
                 }
-            }));
+            });
         }
 
         /// <summary>
@@ -62,14 +64,15 @@ namespace YukariAPI.Controller
         /// </summary>
         /// <param name="apikey">key</param>
         /// <param name="action">动作期望</param>
+        [UsedImplicitly]
         [Get(Route = "/setu/auth")]
-        public Task<JsonResult> ApiKeyVerify(string apikey = null, int action = -1)
+        public JsonResult ApiKeyVerify(string apikey = null, int action = -1)
         {
             if (string.IsNullOrEmpty(apikey))
-                return Task.FromResult(Utils.GenResult(null, 400, "Auth:Request refused(illegal apikey)"));
+                return Utils.GenResult(null, 400, "Auth:Request refused(illegal apikey)");
             //apikey检查
             AuthLevel level = AuthDB.GetAuthLevel(apikey);
-            return Task.FromResult(Utils.GenResult(new
+            return Utils.GenResult(new
             {
                 Level = level,
                 Actions = level switch
@@ -79,7 +82,7 @@ namespace YukariAPI.Controller
                     AuthLevel.User => new[] {HsoAction.RandomPic},
                     _ => new[] {HsoAction.None}
                 }
-            }));
+            });
         }
 
         /// <summary>
@@ -88,6 +91,7 @@ namespace YukariAPI.Controller
         /// <param name="apikey">apikey</param>
         /// <param name="pid">pid</param>
         /// <param name="index">index</param>
+        [UsedImplicitly]
         [Get(Route = "/setu/add_pic")]
         public async Task<JsonResult> AddPic(string apikey = null, long pid = 0, int index = -1)
         {
@@ -170,6 +174,7 @@ namespace YukariAPI.Controller
         /// <param name="apikey">apikey</param>
         /// <param name="pid">pid</param>
         /// <param name="index">index</param>
+        [UsedImplicitly]
         [Get(Route = "setu/del_pic")]
         public Task<JsonResult> DelPic(string apikey = null, long pid = 0, int index = -1)
         {
