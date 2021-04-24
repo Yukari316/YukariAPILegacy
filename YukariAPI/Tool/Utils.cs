@@ -12,7 +12,7 @@ namespace YukariAPI.Tool
         /// <param name="data">数据数组</param>
         /// <param name="code">返回代码</param>
         /// <param name="message">API消息</param>
-        public static JsonResult GenResult(List<object> data, int code = 0, string message = "OK")
+        public static JsonResult GenResult<T>(List<T> data, int code = 0, string message = "OK")
         {
             return new(new
             {
