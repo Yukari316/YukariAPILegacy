@@ -23,18 +23,20 @@ namespace YukariAPI
         /// <param name="useDebugLog">使用debug日志</param>
         public ApiServer(int port, bool useDebugLog = false)
         {
-            Server              = new HttpApiServer();
-            Server.Options.Host = "127.0.0.1";
-            Server.Options.Port = port;
-            //设置log
-            Server.Options.LogLevel     = useDebugLog ? LogType.Debug : LogType.Info;
-            Server.Options.LogToConsole = true;
-            Server.Options.Debug        = useDebugLog;
-            ConsoleLog.SetLogLevel(useDebugLog ? LogLevel.Debug : LogLevel.Info);
-            Server.Options.CrossDomain = new OptionsAttribute
+            Server = new HttpApiServer
             {
-                AllowOrigin = "*"
+                Options =
+                {
+                    Host         = "127.0.0.1",
+                    Port         = port,
+                    LogLevel     = useDebugLog ? LogType.Debug : LogType.Info,
+                    LogToConsole = true,
+                    Debug        = useDebugLog,
+                    CrossDomain  = new OptionsAttribute {AllowOrigin = "*"}
+                }
             };
+            //设置log
+            ConsoleLog.SetLogLevel(useDebugLog ? LogLevel.Debug : LogLevel.Info);
             //注册所有控制器
             Server.Register(Assembly.GetExecutingAssembly());
         }
