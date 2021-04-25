@@ -256,5 +256,6 @@ __pycache__/
 /Native.Sdk/Cqp.Tool
 /Native.Csharp/Sdk.Cqp/Api/CnApi.cs
 Lib/
-AntiRain/Properties/launchSettings.json
-HsoAPI/Properties/launchSettings.json
+
+#launchSettings
+launchSettings.json
