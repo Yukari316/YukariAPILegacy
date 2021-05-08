@@ -92,7 +92,7 @@ namespace YukariAPI.Controller
         /// <param name="index">index</param>
         [UsedImplicitly]
         [Get(Route = "/setu/add_pic")]
-        public async Task<JsonResult> AddPic(string apikey = null, long pid = 0, int index = -1)
+        public async Task<JsonResult> AddPic(string apikey = null, long pid = 0, int? index = null)
         {
             if (string.IsNullOrEmpty(apikey))
                 return Utils.GenResult(null, 403, "Auth:Request refused(illegal apikey)");
@@ -139,18 +139,33 @@ namespace YukariAPI.Controller
             picInfo.Uploader = apikey;
             var successCount = 0;
 
-            //写入数据库
-            for (var i = 0; i < proxyUrls.urls.Count; i++)
+            if (index != null)
             {
-                if (PicDB.PicExitis(pid, i)) continue;
+                if (PicDB.PicExitis(pid, (int)index)) return Utils.GenResult(null, -2, "Pic:Pic existed");
                 //写入对应图片信息
-                picInfo.Index = i;
-                picInfo.Url   = proxyUrls.urls[i];
+                picInfo.Index = (int)index;
+                picInfo.Url   = proxyUrls.urls[(int)index];
                 var id = PicDB.InsertNewPic(picInfo);
                 if (id == -1)
                     return Utils.GenResult(null, 500,
-                                          "Database:Database error(add new pic failed)");
+                                           "Database:Database error(add new pic failed)");
                 successCount++;
+            }
+            else
+            {
+                //写入数据库
+                for (var i = 0; i < proxyUrls.urls.Count; i++)
+                {
+                    if (PicDB.PicExitis(pid, i)) continue;
+                    //写入对应图片信息
+                    picInfo.Index = i;
+                    picInfo.Url   = proxyUrls.urls[i];
+                    var id = PicDB.InsertNewPic(picInfo);
+                    if (id == -1)
+                        return Utils.GenResult(null, 500,
+                                               "Database:Database error(add new pic failed)");
+                    successCount++;
+                }
             }
             //返回数据
             return Utils.GenResult(new

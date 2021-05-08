@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Text;
 using YukariAPI.Tool;
 
 namespace YukariAPI.Database
@@ -137,9 +138,18 @@ namespace YukariAPI.Database
             try
             {
                 using var client = SugarUtils.CreateSqlSugarClient();
-                return client.Insertable(pic)
-                             .IgnoreColumns(col => new {col.Id})
-                             .ExecuteReturnIdentity();
+                var       sql    = new StringBuilder();
+                //ORM插入不支持四字节UTF8我傻了
+                sql.Append(@"INSERT INTO `setu` (`pid`,`index`,`uid`,`title`,`author`,`r18`,`tags`,`url`,`uploader`) ");
+                sql.Append($@"VALUES ('{pic.PicId}','{pic.Index}','{pic.UserId}',");
+                sql.Append($@"FROM_BASE64('{Convert.ToBase64String(Encoding.UTF8.GetBytes(pic.Title))}'),");
+                sql.Append($@"FROM_BASE64('{Convert.ToBase64String(Encoding.UTF8.GetBytes(pic.Author))}'),");
+                sql.Append($@"'{Convert.ToInt32(pic.R18)}',");
+                sql.Append($@"FROM_BASE64('{Convert.ToBase64String(Encoding.UTF8.GetBytes(pic.Tags))}'),");
+                sql.Append($@"'{pic.Url}','{pic.Uploader}');");
+                sql.Append("SELECT LAST_INSERT_ID();");
+                
+                return client.Ado.GetInt(sql.ToString());
             }
             catch (Exception e)
             {
