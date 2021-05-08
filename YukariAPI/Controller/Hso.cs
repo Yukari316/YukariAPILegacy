@@ -53,8 +53,7 @@ namespace YukariAPI.Controller
                     author = pic.Author,
                     r18    = pic.R18,
                     tags   = pic.Tags.Split(','),
-                    url    = pic.Url,
-                    th = Environment.CurrentManagedThreadId
+                    url    = pic.Url
                 }
             });
         }
@@ -98,8 +97,8 @@ namespace YukariAPI.Controller
             if (string.IsNullOrEmpty(apikey))
                 return Utils.GenResult(null, 403, "Auth:Request refused(illegal apikey)");
             //apikey检查
-            AuthLevel level = AuthDB.GetAuthLevel(apikey);
-            switch (level)
+            var authLevel = AuthDB.GetAuthLevel(apikey);
+            switch (authLevel)
             {
                 case AuthLevel.None:case AuthLevel.User:
                     return Utils.GenResult(null, 403, "Auth:Request refused(access denied)");
@@ -136,16 +135,18 @@ namespace YukariAPI.Controller
                 return Utils.GenResult(null, -1,
                                        $"WebAPI:Pixiv api error({picApiRes.message})");
             var picInfo      = picApiRes.picData;
-            int successCount = 0;
+            //写入上传者
+            picInfo.Uploader = apikey;
+            var successCount = 0;
 
             //写入数据库
-            for (int i = 0; i < proxyUrls.urls.Count; i++)
+            for (var i = 0; i < proxyUrls.urls.Count; i++)
             {
                 if (PicDB.PicExitis(pid, i)) continue;
                 //写入对应图片信息
                 picInfo.Index = i;
                 picInfo.Url   = proxyUrls.urls[i];
-                int id = PicDB.InsertNewPic(picInfo);
+                var id = PicDB.InsertNewPic(picInfo);
                 if (id == -1)
                     return Utils.GenResult(null, 500,
                                           "Database:Database error(add new pic failed)");

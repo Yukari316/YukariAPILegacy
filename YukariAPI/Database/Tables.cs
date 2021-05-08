@@ -1,3 +1,4 @@
+using Dm;
 using SqlSugar;
 using YukariAPI.Enumeration;
 
@@ -36,6 +37,9 @@ namespace YukariAPI.Database
 
         [SugarColumn(ColumnName = "url", ColumnDataType = "varchar(255)")]
         public string Url { get; set; }
+        
+        [SugarColumn(ColumnName = "uploader", ColumnDataType = "varchar(255)")]
+        public string Uploader { get; set; }
     }
 
     /// <summary>
@@ -52,6 +56,9 @@ namespace YukariAPI.Database
 
         [SugarColumn(ColumnName = "requset_count", ColumnDataType = "int(11)")]
         public int RequestCount { get; set; }
+        
+        [SugarColumn(ColumnName = "desc", ColumnDataType = "varchar(64)")]
+        public string Desc { get; set; }
     }
     #endregion
 }
