@@ -91,7 +91,7 @@ namespace YukariAPI.Controller
         /// <param name="pid">pid</param>
         /// <param name="index">index</param>
         [UsedImplicitly]
-        [Get(Route = "/setu/add_pic")]
+        [Post(Route = "/setu/add_pic")]
         public async Task<JsonResult> AddPic(string apikey = null, long pid = 0, int? index = null)
         {
             if (string.IsNullOrEmpty(apikey))
@@ -191,7 +191,7 @@ namespace YukariAPI.Controller
         /// <param name="pid">pid</param>
         /// <param name="index">index</param>
         [UsedImplicitly]
-        [Get(Route = "setu/del_pic")]
+        [Del(Route = "setu/del_pic")]
         public Task<JsonResult> DelPic(string apikey = null, long pid = 0, int index = -1)
         {
             if (string.IsNullOrEmpty(apikey))
