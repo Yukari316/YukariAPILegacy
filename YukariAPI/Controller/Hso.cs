@@ -25,15 +25,19 @@ namespace YukariAPI.Controller
             var qPicList = PicDB.GetAllIdlList(r18);
             if (qPicList == null || qPicList.Count == 0)
             {
+                context.Response.Code    = "500";
+                context.Response.CodeMsg = "Server Error";
                 return Utils.GenResult(null, 500, "Database:Get Pic Index Failed");
             }
             //随机选取ID
-            Random rd       = new Random();
-            var    randomId = rd.Next(0, qPicList.Count - 1);
+            var rd       = new Random();
+            var randomId = rd.Next(0, qPicList.Count - 1);
             //获取图片信息
             var pic = PicDB.GetPicById(qPicList[randomId]);
             if (pic == null)
             {
+                context.Response.Code    = "500";
+                context.Response.CodeMsg = "Server Error";
                 return Utils.GenResult(null, 500, "Database:Get Pic Index Failed");
             }
             //计数器
@@ -62,19 +66,23 @@ namespace YukariAPI.Controller
         /// 色图添加功能
         /// </summary>
         /// <param name="apikey">key</param>
-        /// <param name="action">动作期望</param>
+        /// <param name="context">请求信息</param>
         [UsedImplicitly]
         [Get(Route = "/setu/auth")]
-        public JsonResult ApiKeyVerify(string apikey = null, int action = -1)
+        public JsonResult ApiKeyVerify(IHttpContext context, [CanBeNull] string apikey)
         {
             if (string.IsNullOrEmpty(apikey))
+            {
+                context.Response.Code    = "400";
+                context.Response.CodeMsg = "Illegal Request";
                 return Utils.GenResult(null, 400, "Auth:Request refused(illegal apikey)");
+            }
             //apikey检查
-            AuthLevel level = AuthDB.GetAuthLevel(apikey);
+            var level = AuthDB.GetAuthLevel(apikey);
             return Utils.GenResult(new
             {
-                Level = level,
-                Actions = level switch
+                level,
+                actions = level switch
                 {
                     AuthLevel.Admin => new[] {HsoAction.RandomPic, HsoAction.AddPic, HsoAction.DeletePic},
                     AuthLevel.None => new[] {HsoAction.None},
@@ -87,32 +95,48 @@ namespace YukariAPI.Controller
         /// <summary>
         /// 色图添加功能
         /// </summary>
+        /// <param name="context">请求信息</param>
         /// <param name="apikey">apikey</param>
         /// <param name="pid">pid</param>
         /// <param name="index">index</param>
         [UsedImplicitly]
         [Post(Route = "/setu/add_pic")]
-        public async Task<JsonResult> AddPic(string apikey = null, long pid = 0, int? index = null)
+        public async Task<JsonResult> AddPic(IHttpContext context, string apikey = null, long pid = 0, int? index = null)
         {
             if (string.IsNullOrEmpty(apikey))
+            {
+                context.Response.Code    = "403";
+                context.Response.CodeMsg = "Access Denied";
                 return Utils.GenResult(null, 403, "Auth:Request refused(illegal apikey)");
+            }
             //apikey检查
             var authLevel = AuthDB.GetAuthLevel(apikey);
             switch (authLevel)
             {
                 case AuthLevel.None:case AuthLevel.User:
+                    context.Response.Code    = "403";
+                    context.Response.CodeMsg = "Access Denied";
                     return Utils.GenResult(null, 403, "Auth:Request refused(access denied)");
                 case AuthLevel.Admin:
                     break;
                 default:
+                    context.Response.Code    = "400";
+                    context.Response.CodeMsg = "Illegal Request";
                     return Utils.GenResult(null, 400, "Auth:Request refused(unknown apikey)");
             }
             //检查pid
-            if (pid <= 0) return Utils.GenResult(null, 400, "Argument:Argument out of range(pid)");
+            if (pid <= 0)
+            {
+                context.Response.Code    = "400";
+                context.Response.CodeMsg = "Illegal Request";
+                return Utils.GenResult(null, 400, "Argument:Argument out of range(pid)");
+            }
 
             //更新数据库计数
             if (!AuthDB.ApiKeyRequestCountUpdate(apikey, AuthDB.GetApiKeyRequestCount(apikey) + 1))
             {
+                context.Response.Code    = "500";
+                context.Response.CodeMsg = "Server Error";
                 return Utils.GenResult(null, 500, "Database:Database error(update apikey count)");
             }
 
@@ -124,8 +148,12 @@ namespace YukariAPI.Controller
             //判断图片是否已经存在
             int picCount  = PicDB.GetPicCountByPid(pid);
             if (picCount == -1)
+            {
+                context.Response.Code    = "500";
+                context.Response.CodeMsg = "Server Error";
                 return Utils.GenResult(null, 500,
                                        "Database:Database error(get pic count failed)");
+            }
             if (picCount >= proxyUrls.urls.Count)
                 return Utils.GenResult(null, -2, "Pic:Pic existed");
             if (index > proxyUrls.urls.Count - 1) return Utils.GenResult(null, -3, "Pic:illegal Pic index");
@@ -147,8 +175,12 @@ namespace YukariAPI.Controller
                 picInfo.Url   = proxyUrls.urls[(int)index];
                 var id = PicDB.InsertNewPic(picInfo);
                 if (id == -1)
+                {
+                    context.Response.Code    = "500";
+                    context.Response.CodeMsg = "Server Error";
                     return Utils.GenResult(null, 500,
                                            "Database:Database error(add new pic failed)");
+                }
                 successCount++;
             }
             else
@@ -162,8 +194,12 @@ namespace YukariAPI.Controller
                     picInfo.Url   = proxyUrls.urls[i];
                     var id = PicDB.InsertNewPic(picInfo);
                     if (id == -1)
+                    {
+                        context.Response.Code    = "500";
+                        context.Response.CodeMsg = "Server Error";
                         return Utils.GenResult(null, 500,
                                                "Database:Database error(add new pic failed)");
+                    }
                     successCount++;
                 }
             }
@@ -187,24 +223,33 @@ namespace YukariAPI.Controller
         /// <summary>
         /// 删除图片
         /// </summary>
+        /// <param name="context">请求信息</param>
         /// <param name="apikey">apikey</param>
-        /// <param name="pid">pid</param>
+        /// <param name="pid">pid</param>                   
         /// <param name="index">index</param>
         [UsedImplicitly]
         [Del(Route = "setu/del_pic")]
-        public Task<JsonResult> DelPic(string apikey = null, long pid = 0, int index = -1)
+        public Task<JsonResult> DelPic(IHttpContext context, string apikey = null, long pid = 0, int index = -1)
         {
             if (string.IsNullOrEmpty(apikey))
+            {
+                context.Response.Code    = "403";
+                context.Response.CodeMsg = "Access Denied";
                 return Task.FromResult(Utils.GenResult(null, 403, "Auth:Request refused(illegal apikey)"));
+            }
             //apikey检查
-            AuthLevel level = AuthDB.GetAuthLevel(apikey);
+            var level = AuthDB.GetAuthLevel(apikey);
             switch (level)
             {
                 case AuthLevel.None:case AuthLevel.User:
+                    context.Response.Code    = "403";
+                    context.Response.CodeMsg = "Access Denied";
                     return Task.FromResult(Utils.GenResult(null, 403, "Auth:Request refused(access denied)"));
                 case AuthLevel.Admin:
                     break;
                 default:
+                    context.Response.Code    = "400";
+                    context.Response.CodeMsg = "Illegal Request";
                     return Task.FromResult(Utils.GenResult(null, 400, "Auth:Request refused(unknown apikey)"));
             }
             //检查pid
@@ -213,21 +258,31 @@ namespace YukariAPI.Controller
             //更新数据库计数
             if (!AuthDB.ApiKeyRequestCountUpdate(apikey, AuthDB.GetApiKeyRequestCount(apikey) + 1))
             {
+                context.Response.Code    = "500";
+                context.Response.CodeMsg = "Server Error";
                 return Task.FromResult(Utils.GenResult(null, 500, "Database:Database error(update apikey count)"));
             }
 
             //查找图片是否存在
-            if(!PicDB.PicExitis(pid)) return Task.FromResult(Utils.GenResult(null, 404, "Database:Pic not found"));
+            if(!PicDB.PicExitis(pid))
+            {
+                context.Response.Code    = "404";
+                context.Response.CodeMsg = "Not Found";
+                return Task.FromResult(Utils.GenResult(null, 404, "Database:Pic not found"));
+            }
             //删除图片
-            if (index == -1)
+            if (index == -1 && !PicDB.DeletePic(pid))
             {
-                if(!PicDB.DeletePic(pid)) return Task.FromResult(Utils.GenResult(null, 500, "Database:Pic delete failed"));
+                context.Response.Code    = "500";
+                context.Response.CodeMsg = "Server Error";
+                return Task.FromResult(Utils.GenResult(null, 500, "Database:Pic delete failed"));
             }
-            else
-            {
-                if(!PicDB.DeletePic(pid, index)) return Task.FromResult(Utils.GenResult(null, 500, "Database:Pic delete failed"));
-            }
-            return Task.FromResult(Utils.GenResult(new {}));
+            
+            if (PicDB.DeletePic(pid, index)) return Task.FromResult(Utils.GenResult(new { }));
+            //图片删除失败
+            context.Response.Code    = "500";
+            context.Response.CodeMsg = "Server Error";
+            return Task.FromResult(Utils.GenResult(null, 500, "Database:Pic delete failed"));
         }
     }
 }

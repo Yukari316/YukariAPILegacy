@@ -5,14 +5,14 @@ namespace YukariAPI.Enumeration
         /// <summary>
         /// 无权限
         /// </summary>
-        None,
+        None = 0,
         /// <summary>
         /// 仅获取图片
         /// </summary>
-        User,
+        User = 1,
         /// <summary>
         /// 图库管理员
         /// </summary>
-        Admin
+        Admin = 2
     }
 }

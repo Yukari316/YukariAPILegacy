@@ -4,7 +4,6 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Newtonsoft.Json.Linq;
 using PyLibSharp.Requests;
 using YukariAPI.Database;
 using YukariAPI.Tool;
@@ -32,7 +31,7 @@ namespace YukariAPI
                 });
 
                 //检查返回数据
-                JToken illustJson = res.Json();
+                var illustJson = res.Json();
                 if (illustJson == null) return (false, "get null respose from pixiv", null);
                 if (Convert.ToBoolean(illustJson["error"] ?? true))
                     return (false, $"pixivcat failed({illustJson["message"]})", null);
@@ -47,7 +46,7 @@ namespace YukariAPI
                     R18 = Convert.ToBoolean(illustJson["body"]?["xRestrict"] ?? true)
                 };
                 //处理tag
-                JToken tagArray = illustJson["body"]?["tags"]?["tags"];
+                var tagArray = illustJson["body"]?["tags"]?["tags"];
                 if (tagArray == null) return (false, "can not get pic tags", null);
                 List<string> tags = new();
                 foreach (var tag in tagArray)
@@ -93,12 +92,12 @@ namespace YukariAPI
                 });
                 if (res.StatusCode != HttpStatusCode.OK) return (false, $"pixivcat respose ({res.StatusCode})", null);
                 //检查返回数据
-                JToken proxyJson = res.Json();
+                var proxyJson = res.Json();
                 if (proxyJson == null) return (false, "get null respose from pixivcat", null);
                 if (!Convert.ToBoolean(proxyJson["success"] ?? false))
                     return (false, $"pixivcat failed({proxyJson["error"]})", null);
                 //是否为多张图片
-                List<string> urls = Convert.ToBoolean(proxyJson["multiple"] ?? false)
+                var urls = Convert.ToBoolean(proxyJson["multiple"] ?? false)
                     ? proxyJson["original_urls_proxy"]?.ToObject<List<string>>()
                     : new List<string> {proxyJson["original_url_proxy"]?.ToString() ?? string.Empty};
                 return (true, "OK", urls);
