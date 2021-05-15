@@ -1,5 +1,6 @@
 using System.Threading.Tasks;
 using YukariAPI.Tool;
+using YukariToolBox.FormatLog;
 
 namespace YukariAPI
 {
@@ -13,8 +14,8 @@ namespace YukariAPI
             Updater = new DataUpdater();
             // dataUpdater.Update(null);
             //启动服务器
-            var         server      = new ApiServer(19200);
-            ConsoleLog.Info("Server","start server");
+            var server = new ApiServer(19200);
+            Log.Info("Server", "start server");
             //启动服务器
             await server.StartServer();
         }

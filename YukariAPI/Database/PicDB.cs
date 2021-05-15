@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using YukariAPI.Tool;
+using YukariToolBox.FormatLog;
 
 namespace YukariAPI.Database
 {
@@ -21,7 +21,7 @@ namespace YukariAPI.Database
             }
             catch (Exception e)
             {
-                ConsoleLog.Error("Database", ConsoleLog.ErrorLogBuilder(e));
+                Log.Error("Database", Log.ErrorLogBuilder(e));
                 return null;
             }
         }
@@ -44,7 +44,7 @@ namespace YukariAPI.Database
             }
             catch (Exception e)
             {
-                ConsoleLog.Error("Database", ConsoleLog.ErrorLogBuilder(e));
+                Log.Error("Database", Log.ErrorLogBuilder(e));
                 return -1;
             }
         }
@@ -64,7 +64,7 @@ namespace YukariAPI.Database
             }
             catch (Exception e)
             {
-                ConsoleLog.Error("Database", ConsoleLog.ErrorLogBuilder(e));
+                Log.Error("Database", Log.ErrorLogBuilder(e));
                 return -1;
             }
         }
@@ -85,7 +85,7 @@ namespace YukariAPI.Database
             }
             catch (Exception e)
             {
-                ConsoleLog.Error("Database", $"{ConsoleLog.ErrorLogBuilder(e)}");
+                Log.Error("Database", $"{Log.ErrorLogBuilder(e)}");
                 return null;
             }
         }
@@ -105,7 +105,7 @@ namespace YukariAPI.Database
             }
             catch (Exception e)
             {
-                ConsoleLog.Error("Database", ConsoleLog.ErrorLogBuilder(e));
+                Log.Error("Database", Log.ErrorLogBuilder(e));
                 return true;
             }
         }
@@ -124,7 +124,7 @@ namespace YukariAPI.Database
             }
             catch (Exception e)
             {
-                ConsoleLog.Error("Database", ConsoleLog.ErrorLogBuilder(e));
+                Log.Error("Database", Log.ErrorLogBuilder(e));
                 return true;
             }
         }
@@ -148,12 +148,12 @@ namespace YukariAPI.Database
                 sql.Append($@"FROM_BASE64('{Convert.ToBase64String(Encoding.UTF8.GetBytes(pic.Tags))}'),");
                 sql.Append($@"'{pic.Url}','{pic.Uploader}');");
                 sql.Append("SELECT LAST_INSERT_ID();");
-                
+
                 return client.Ado.GetInt(sql.ToString());
             }
             catch (Exception e)
             {
-                ConsoleLog.Error("Database", ConsoleLog.ErrorLogBuilder(e));
+                Log.Error("Database", Log.ErrorLogBuilder(e));
                 return -1;
             }
         }
@@ -173,7 +173,7 @@ namespace YukariAPI.Database
             }
             catch (Exception e)
             {
-                ConsoleLog.Error("Database", ConsoleLog.ErrorLogBuilder(e));
+                Log.Error("Database", Log.ErrorLogBuilder(e));
                 return false;
             }
         }
@@ -194,7 +194,7 @@ namespace YukariAPI.Database
             }
             catch (Exception e)
             {
-                ConsoleLog.Error("Database", ConsoleLog.ErrorLogBuilder(e));
+                Log.Error("Database", Log.ErrorLogBuilder(e));
                 return false;
             }
         }

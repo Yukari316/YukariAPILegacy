@@ -6,7 +6,7 @@ using BeetleX.Buffers;
 using BeetleX.FastHttpApi;
 using PyLibSharp.Requests;
 using YukariAPI.Res;
-using YukariAPI.Tool;
+using YukariToolBox.FormatLog;
 
 namespace YukariAPI.Result
 {
@@ -16,6 +16,7 @@ namespace YukariAPI.Result
         /// XML文本内容
         /// </summary>
         private string XmlString { get; set; }
+
         /// <summary>
         /// 构造SVG返回类型
         /// </summary>
@@ -45,18 +46,22 @@ namespace YukariAPI.Result
                     XmlString = Encoding.UTF8.GetString(Resource.Error);
                     return;
                 }
+
                 //写入XML
                 XmlString = res.Text;
             }
             catch (Exception e)
             {
-                ConsoleLog.Error("svg get error", ConsoleLog.ErrorLogBuilder(e));
+                Log.Error("svg get error", Log.ErrorLogBuilder(e));
                 XmlString = Encoding.UTF8.GetString(Resource.Error);
             }
         }
+
         public override bool HasBody => true;
+
         //设置SVG内容类型
         public override IHeaderItem ContentType => new HeaderItem("Content-Type: image/svg+xml;charset=utf-8\r\n");
+
         //写入SVG XML
         public override void Write(PipeStream stream, HttpResponse response)
         {

@@ -27,7 +27,7 @@ namespace YukariAPI.Controller
                 var words = GlobalVariable.Nene[key];
                 return Utils.GenResult(new List<string> {words[rd.Next(0, words.Length - 1)]});
             }
-            
+
             //查找怪话语录
             var searchRes = GlobalVariable.Nene
                                           .Where(i => i.Key.Contains(keyword))

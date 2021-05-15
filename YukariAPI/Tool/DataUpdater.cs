@@ -41,12 +41,12 @@ namespace YukariAPI.Tool
                         GlobalVariable.Nene.AddOrUpdate(key, wordArray, (_, _) => wordArray);
                     }
                 }
-                
+
                 Log.Info("Updater", "Update success");
             }
             catch (Exception e)
             {
-                Log.Error("Date update error", ConsoleLog.ErrorLogBuilder(e));
+                Log.Error("Date update error", Log.ErrorLogBuilder(e));
             }
         }
     }

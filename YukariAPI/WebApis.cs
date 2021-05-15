@@ -6,7 +6,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using PyLibSharp.Requests;
 using YukariAPI.Database;
-using YukariAPI.Tool;
+using YukariToolBox.FormatLog;
 
 namespace YukariAPI
 {
@@ -35,15 +35,15 @@ namespace YukariAPI
                 if (illustJson == null) return (false, "get null respose from pixiv", null);
                 if (Convert.ToBoolean(illustJson["error"] ?? true))
                     return (false, $"pixivcat failed({illustJson["message"]})", null);
-                
+
                 //读取数据内容
                 var pic = new HsoPic
                 {
-                    PicId = pid,
+                    PicId  = pid,
                     UserId = Convert.ToInt64(illustJson["body"]?["userId"] ?? -1),
                     Author = illustJson["body"]?["userName"]?.ToString() ?? string.Empty,
-                    Title = illustJson["body"]?["title"]?.ToString() ?? string.Empty,
-                    R18 = Convert.ToBoolean(illustJson["body"]?["xRestrict"] ?? true)
+                    Title  = illustJson["body"]?["title"]?.ToString()    ?? string.Empty,
+                    R18    = Convert.ToBoolean(illustJson["body"]?["xRestrict"] ?? true)
                 };
                 //处理tag
                 var tagArray = illustJson["body"]?["tags"]?["tags"];
@@ -52,12 +52,13 @@ namespace YukariAPI
                 foreach (var tag in tagArray)
                 {
                     //原tag
-                    if(tag["tag"] != null)
+                    if (tag["tag"] != null)
                         tags.Add(tag["tag"].ToString());
                     //翻译后tag
-                    if(tag["translation"]?["en"] != null)
+                    if (tag["translation"]?["en"] != null)
                         tags.Add(tag["translation"]?["en"].ToString());
                 }
+
                 //为防止API中的xRestrict错误，使用tag再次判断R18值
                 pic.R18 = tags.Any(tag => tag.Equals("R-18"));
                 //写入tag
@@ -66,11 +67,11 @@ namespace YukariAPI
             }
             catch (Exception e)
             {
-                ConsoleLog.Error("pixiv api error", ConsoleLog.ErrorLogBuilder(e));
+                Log.Error("pixiv api error", Log.ErrorLogBuilder(e));
                 return (false, "", null);
             }
         }
-        
+
         /// <summary>
         /// PixivCat代理连接生成
         /// </summary>
@@ -104,7 +105,7 @@ namespace YukariAPI
             }
             catch (Exception e)
             {
-                ConsoleLog.Error("pixiv api error", ConsoleLog.ErrorLogBuilder(e));
+                Log.Error("pixiv api error", Log.ErrorLogBuilder(e));
                 return (false, $"pixiv api error ({e})", null);
             }
         }
@@ -129,7 +130,7 @@ namespace YukariAPI
             }
             catch (Exception e)
             {
-                ConsoleLog.Error("count api error", ConsoleLog.ErrorLogBuilder(e));
+                Log.Error("count api error", Log.ErrorLogBuilder(e));
                 return null;
             }
         }

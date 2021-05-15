@@ -7,6 +7,6 @@ namespace YukariAPI.Res
         /// <summary>
         /// 二次元怪话语录
         /// </summary>
-        public static readonly ConcurrentDictionary<string,string[]> Nene = new();
+        public static readonly ConcurrentDictionary<string, string[]> Nene = new();
     }
 }
