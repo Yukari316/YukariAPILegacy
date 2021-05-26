@@ -2,7 +2,7 @@ using YukariAPI.Enumeration;
 
 namespace YukariAPI.Database
 {
-    public class AuthDB
+    public static class AuthDB
     {
         /// <summary>
         /// 获取权限等级
