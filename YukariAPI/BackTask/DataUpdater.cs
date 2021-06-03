@@ -6,7 +6,7 @@ using PyLibSharp.Requests;
 using YukariAPI.Res;
 using YukariToolBox.FormatLog;
 
-namespace YukariAPI.Tool
+namespace YukariAPI.BackTask
 {
     /// <summary>
     /// 定时动态数据更新/缓存任务

@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using BeetleX.FastHttpApi;
 using YukariAPI.Enumeration;
 
-namespace YukariAPI.Tool
+namespace YukariAPI
 {
     public static class Utils
     {

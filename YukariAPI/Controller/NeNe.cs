@@ -4,7 +4,6 @@ using System.Linq;
 using BeetleX.FastHttpApi;
 using JetBrains.Annotations;
 using YukariAPI.Res;
-using Utils = YukariAPI.Tool.Utils;
 
 namespace YukariAPI.Controller
 {
