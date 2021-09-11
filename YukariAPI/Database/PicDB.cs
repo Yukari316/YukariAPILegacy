@@ -118,7 +118,7 @@ namespace YukariAPI.Database
                 using var client = SugarUtils.CreateSqlSugarClient();
                 var       sql    = new StringBuilder();
                 //ORM插入不支持四字节UTF8我傻了
-                sql.Append(@"INSERT INTO ` setu` (`pid`,`index`,`uid`,`title`,`author`,`r18`,`tags`,`url`,`uploader`) ");
+                sql.Append(@"INSERT INTO `setu` (`pid`,`index`,`uid`,`title`,`author`,`r18`,`tags`,`url`,`uploader`) ");
                 sql.Append($@"VALUES ('{pic.PicId}','{pic.Index}','{pic.UserId}',");
                 sql.Append($@"FROM_BASE64('{Convert.ToBase64String(Encoding.UTF8.GetBytes(pic.Title))}'),");
                 sql.Append($@"FROM_BASE64('{Convert.ToBase64String(Encoding.UTF8.GetBytes(pic.Author))}'),");
