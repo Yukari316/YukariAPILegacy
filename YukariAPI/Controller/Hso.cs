@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using BeetleX.FastHttpApi;
@@ -20,25 +19,13 @@ namespace YukariAPI.Controller
         [Get(Route = "/setu/")]
         public JsonResult RandomPic(IHttpContext context, bool r18 = false)
         {
-            //获取ID列表
-            var qPicList = PicDB.GetAllIdlList(r18);
-            if (qPicList == null || qPicList.Count == 0)
-            {
-                context.Response.Code    = "500";
-                context.Response.CodeMsg = "Server Error";
-                return Utils.GenResult(null, 500, "Database:Get Pic Index Failed");
-            }
-
-            //随机选取ID
-            var rd       = new Random();
-            var randomId = rd.Next(0, qPicList.Count - 1);
             //获取图片信息
-            var pic = PicDB.GetPicById(qPicList[randomId]);
+            var pic = PicDB.GetRandomPic(r18);
             if (pic == null)
             {
                 context.Response.Code    = "500";
                 context.Response.CodeMsg = "Server Error";
-                return Utils.GenResult(null, 500, "Database:Get Pic Index Failed");
+                return Utils.GenResult(null, 500, "Database:Get Pic Failed");
             }
 
             //计数器

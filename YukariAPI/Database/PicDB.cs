@@ -1,31 +1,12 @@
 using System;
-using System.Collections.Generic;
 using System.Text;
+using SqlSugar;
 using YukariToolBox.FormatLog;
 
 namespace YukariAPI.Database
 {
     public class PicDB
     {
-        /// <summary>
-        /// 查找图片
-        /// </summary>
-        /// <param name="id">数据库id</param>
-        public static HsoPic GetPicById(long id)
-        {
-            try
-            {
-                using var client = SugarUtils.CreateSqlSugarClient();
-                return client.Queryable<HsoPic>()
-                             .InSingle(id);
-            }
-            catch (Exception e)
-            {
-                Log.Error("Database", Log.ErrorLogBuilder(e));
-                return null;
-            }
-        }
-
         /// <summary>
         /// 查询数据库图片计数
         /// </summary>
@@ -69,23 +50,20 @@ namespace YukariAPI.Database
             }
         }
 
-        /// <summary>
-        /// 获取图片id列表
-        /// </summary>
-        /// <param name="r18">r18开关</param>
-        public static List<long> GetAllIdlList(bool r18)
+        public static HsoPic GetRandomPic(bool r18)
         {
             try
             {
                 using var client = SugarUtils.CreateSqlSugarClient();
                 return client.Queryable<HsoPic>()
                              .Where(pic => pic.R18 == r18)
-                             .Select(id => id.Id)
-                             .ToList();
+                             .OrderBy(pic => SqlFunc.GetRandom())
+                             .Take(1)
+                             .First();
             }
             catch (Exception e)
             {
-                Log.Error("Database", $"{Log.ErrorLogBuilder(e)}");
+                Log.Error("Database", Log.ErrorLogBuilder(e));
                 return null;
             }
         }
@@ -140,7 +118,7 @@ namespace YukariAPI.Database
                 using var client = SugarUtils.CreateSqlSugarClient();
                 var       sql    = new StringBuilder();
                 //ORM插入不支持四字节UTF8我傻了
-                sql.Append(@"INSERT INTO `setu` (`pid`,`index`,`uid`,`title`,`author`,`r18`,`tags`,`url`,`uploader`) ");
+                sql.Append(@"INSERT INTO ` setu` (`pid`,`index`,`uid`,`title`,`author`,`r18`,`tags`,`url`,`uploader`) ");
                 sql.Append($@"VALUES ('{pic.PicId}','{pic.Index}','{pic.UserId}',");
                 sql.Append($@"FROM_BASE64('{Convert.ToBase64String(Encoding.UTF8.GetBytes(pic.Title))}'),");
                 sql.Append($@"FROM_BASE64('{Convert.ToBase64String(Encoding.UTF8.GetBytes(pic.Author))}'),");
